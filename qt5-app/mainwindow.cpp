@@ -186,12 +186,28 @@ void MainWindow::writeData(const QByteArray &data)
 void MainWindow::readData()
 {
     const QByteArray data = m_serial->readAll();
-    qDebug() << data;
-    m_console->putData(data);
-    // Put data to plot data
-//    x.append(*data.data());
-//    y.append(0);
-    m_plot->SetData(x,y);
+    dataInLine.append(data);
+#ifdef _DEBUG_
+    qDebug() << dataInLine;
+#endif
+    if(data.at(0) == 'V')
+    {
+        // Put data to plot data
+        if(cout > 50)
+        {
+            x.erase(x.begin());
+            y.erase(y.begin());
+        }
+        x.append(cout); // x goes from -1 to 1
+        y.append(rand()%(50-3+1)+3);  // let's plot a quadratic function
+        cout++;
+        m_plot->SetData(x,y);
+    }
+    if(data.at(0) == '\n')
+    {
+        m_console->putData(dataInLine);
+        dataInLine.clear();
+    }
 }
 //! [7]
 
@@ -204,15 +220,27 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
     }
 }
 //! [8]
-
+void MainWindow::Clear()
+{
+    x.clear();
+    y.clear();
+    cout = 0;
+    m_plot->SetData(x,y);
+    m_console->Console::clear();
+}
+void MainWindow::Exit()
+{
+    m_plot->close();
+    this->close();
+}
 void MainWindow::initActionsConnections()
 {
     connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
     connect(m_ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
-    connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
+    connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::Exit);
     connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
     connect(m_ui->actionPlot, &QAction::triggered, m_plot, &plotDialog::show);
-    connect(m_ui->actionClear, &QAction::triggered, m_console, &Console::clear);
+    connect(m_ui->actionClear, &QAction::triggered, this, &MainWindow::Clear);
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 }

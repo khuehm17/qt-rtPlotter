@@ -85,6 +85,8 @@ private slots:
     void readData();
 
     void handleError(QSerialPort::SerialPortError error);
+    void Clear();
+    void Exit();
 
 private:
     void initActionsConnections();
@@ -98,7 +100,9 @@ private:
     SettingsDialog *m_settings = nullptr;
     plotDialog *m_plot = nullptr;
     QSerialPort *m_serial = nullptr;
-    QVector<double> x, y;
+    QVector<double> x, y; // initialize with entries 0..100
+    int cout = 0;
+    QByteArray dataInLine;
 };
 
 #endif // MAINWINDOW_H
