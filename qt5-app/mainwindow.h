@@ -98,6 +98,7 @@ private:
     SettingsDialog *m_settings = nullptr;
     plotDialog *m_plot = nullptr;
     QSerialPort *m_serial = nullptr;
+    QVector<double> x, y;
 };
 
 #endif // MAINWINDOW_H

@@ -13,6 +13,7 @@ class plotDialog : public QDialog
 
 public:
     explicit plotDialog(QWidget *parent = nullptr);
+    void SetData(const QVector<double> &x, const QVector<double> &y);
     ~plotDialog();
 
 private:

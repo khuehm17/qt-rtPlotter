@@ -28,6 +28,10 @@ plotDialog::~plotDialog()
     delete ui;
 }
 
+void plotDialog::SetData(const QVector<double> &x, const QVector<double> &y)
+{
+    ui->customPlot->graph(0)->setData(x, y);
+}
 void plotDialog::makePlot()
 {
     QVector<double> x(101), y(101); // initialize with entries 0..100

@@ -189,6 +189,9 @@ void MainWindow::readData()
     qDebug() << data;
     m_console->putData(data);
     // Put data to plot data
+//    x.append(*data.data());
+//    y.append(0);
+    m_plot->SetData(x,y);
 }
 //! [7]
 
