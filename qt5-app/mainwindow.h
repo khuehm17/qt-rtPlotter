@@ -54,6 +54,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 
@@ -87,6 +88,7 @@ private slots:
     void handleError(QSerialPort::SerialPortError error);
     void Clear();
     void Exit();
+    void closeEvent (QCloseEvent *event);
 
 private:
     void initActionsConnections();

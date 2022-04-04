@@ -58,7 +58,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QMessageBox>
-
+#define _DEBUG_
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -186,28 +186,38 @@ void MainWindow::writeData(const QByteArray &data)
 void MainWindow::readData()
 {
     const QByteArray data = m_serial->readAll();
+    char l_value_a[100] = {1};
+    int l_positionOfComma_u32;
     dataInLine.append(data);
 #ifdef _DEBUG_
-    qDebug() << dataInLine;
+    qDebug() << "\n";
 #endif
-    if(data.at(0) == 'V')
+    //if(data.end() == "\n")
+    if(data.at(data.length()-1) == '\n')
     {
-        // Put data to plot data
         if(cout > 50)
         {
             x.erase(x.begin());
             y.erase(y.begin());
         }
-        x.append(cout); // x goes from -1 to 1
-        y.append(rand()%(50-3+1)+3);  // let's plot a quadratic function
-        cout++;
+        do
+        {
+            l_positionOfComma_u32= dataInLine.indexOf(',');
+            strncpy_s(l_value_a,dataInLine.data(),l_positionOfComma_u32);
+            x.append(cout); // x goes from -1 to 1
+            y.append(atof(l_value_a));  // let's plot a quadratic function
+            cout++;
+            dataInLine.remove(0,l_positionOfComma_u32+1);
+        }while(l_positionOfComma_u32 != -1);
+
+        // Put data to plot data
         m_plot->SetData(x,y);
-    }
-    if(data.at(0) == '\n')
-    {
-        m_console->putData(dataInLine);
         dataInLine.clear();
     }
+//    if(data.at(0) == '\n')
+//    {
+    m_console->putData(data);
+//    }
 }
 //! [7]
 
@@ -231,7 +241,22 @@ void MainWindow::Clear()
 void MainWindow::Exit()
 {
     m_plot->close();
+    m_settings->close();
     this->close();
+}
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+//    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
+//                                                                tr("Are you sure?\n"),
+//                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+//                                                                QMessageBox::Yes);
+//    if (resBtn != QMessageBox::Yes) {
+//        event->ignore();
+//    } else {
+    m_plot->close();
+    m_settings->close();
+    event->accept();
+//    }
 }
 void MainWindow::initActionsConnections()
 {
